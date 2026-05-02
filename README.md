@@ -21,7 +21,7 @@ This is a **Frontend-Only** Campus Notifications application built with **React*
 **Track**: Frontend Only  
 **Framework**: React 18 + Material UI 5  
 **Language**: JavaScript  
-**Status**: ✅ Ready for Pre-Test Setup
+**Status**:  Ready for Pre-Test Setup
 
 ### Features:
 
