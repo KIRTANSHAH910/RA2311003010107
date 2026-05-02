@@ -18,7 +18,6 @@ import {
   StarBorder as StarBorderIcon,
 } from "@mui/icons-material";
 import {
-  getNotificationIcon,
   getNotificationColor,
   formatTimestamp,
 } from "../utils/notificationUtils";
@@ -56,19 +55,19 @@ const NotificationList = ({ notifications }) => {
   };
 
   const handleMarkAsRead = (notification) => {
-    Log("frontend", "info", "component", `Notification marked as read`);
+    Log("frontend", "info", "component", "Notification marked as read");
   };
 
   if (!notifications || notifications.length === 0) {
     return (
-      <Typography variant="body1" sx={{ textAlign: "center", py: 4 }}>
-        No notifications to display
+      <Typography sx={{ textAlign: "center", py: 4 }}>
+        No notifications found
       </Typography>
     );
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
       {notifications.map((notification, index) => {
         const isFavorite = favorites.includes(notification.ID);
         const priorityPercentage = (notification.priority || 0) * 100;
@@ -78,57 +77,53 @@ const NotificationList = ({ notifications }) => {
           <Card
             key={notification.ID}
             sx={{
-              animation: "fadeInUp 0.6s ease forwards",
-              animationDelay: `${index * 0.1}s`,
-              transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+              borderRadius: "12px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              borderLeft: `5px solid ${typeColor}`,
               "&:hover": {
-                boxShadow: "0 20px 40px rgba(102, 126, 234, 0.3)",
-                transform: "translateY(-8px) scale(1.02) rotateX(2deg)",
-                background:
-                  "linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%)",
+                boxShadow: "0 12px 28px rgba(0,0,0,0.12)",
+                transform: "translateY(-4px)",
               },
-              borderLeft: `6px solid ${typeColor}`,
-              borderRadius: "16px",
               position: "relative",
-              overflow: "hidden",
-              background: "rgba(255, 255, 255, 0.95)",
-              backdropFilter: "blur(10px)",
-              perspective: "1000px",
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                top: 0,
-                left: "-100%",
-                width: "100%",
-                height: "100%",
-                background: `linear-gradient(90deg, transparent, ${typeColor}20, transparent)`,
-                transition: "left 0.5s ease",
-              },
-              "&:hover::before": {
-                left: "100%",
-              },
             }}
           >
-            {/* Priority Indicator */}
-            <Box sx={{ px: 2, pt: 1 }}>
+            {/* Priority Bar */}
+            <Box sx={{ px: 2, pt: 1.5, pb: 1 }}>
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
               >
-                <Typography variant="caption" sx={{ color: "#999" }}>
-                  Priority Score
+                <Typography
+                  variant="caption"
+                  sx={{ color: "#718096", fontWeight: 600, fontSize: "0.8rem" }}
+                >
+                  Priority
                 </Typography>
                 <Tooltip
-                  title={`Priority: ${(notification.priority * 100).toFixed(1)}%`}
+                  title={`Priority Score: ${(notification.priority * 100).toFixed(1)}%`}
                 >
                   <LinearProgress
                     variant="determinate"
                     value={priorityPercentage}
-                    sx={{ flex: 1, height: 6, borderRadius: 3 }}
+                    sx={{
+                      flex: 1,
+                      height: 6,
+                      borderRadius: 3,
+                      backgroundColor: "rgba(0,0,0,0.05)",
+                      "& .MuiLinearProgress-bar": {
+                        background: `linear-gradient(90deg, ${typeColor} 0%, ${typeColor}cc 100%)`,
+                      },
+                    }}
                   />
                 </Tooltip>
                 <Typography
                   variant="caption"
-                  sx={{ fontWeight: "bold", minWidth: "40px" }}
+                  sx={{
+                    fontWeight: 700,
+                    minWidth: "45px",
+                    color: typeColor,
+                    fontSize: "0.85rem",
+                  }}
                 >
                   {(notification.priority * 100).toFixed(0)}%
                 </Typography>
@@ -142,18 +137,11 @@ const NotificationList = ({ notifications }) => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    width: 50,
-                    height: 50,
-                    borderRadius: "12px",
-                    background: `linear-gradient(135deg, ${typeColor}20 0%, ${typeColor}40 100%)`,
+                    width: 48,
+                    height: 48,
+                    borderRadius: "10px",
+                    background: `linear-gradient(135deg, ${typeColor}22 0%, ${typeColor}44 100%)`,
                     color: typeColor,
-                    fontWeight: "bold",
-                    fontSize: "24px",
-                    transition: "all 0.3s ease",
-                    boxShadow: `0 4px 12px ${typeColor}30`,
-                    "&:hover": {
-                      transform: "scale(1.1) rotate(-5deg)",
-                    },
                   }}
                 >
                   {getTypeIcon(notification.Type)}
@@ -166,9 +154,8 @@ const NotificationList = ({ notifications }) => {
                     sx={{
                       flex: 1,
                       fontWeight: 700,
-                      background: `linear-gradient(135deg, ${typeColor} 0%, #667eea 100%)`,
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
+                      color: "#2d3748",
+                      fontSize: "1.1rem",
                     }}
                   >
                     {notification.Message}
@@ -182,14 +169,11 @@ const NotificationList = ({ notifications }) => {
                       size="small"
                       onClick={() => handleFavorite(notification.ID)}
                       sx={{
-                        color: isFavorite ? "#ffd700" : "inherit",
+                        color: isFavorite ? "#ffd700" : "#cbd5e0",
                         transition: "all 0.3s ease",
-                        transform: isFavorite
-                          ? "scale(1.2) rotate(20deg)"
-                          : "scale(1)",
                         "&:hover": {
-                          transform: "scale(1.3) rotate(20deg)",
-                          filter: "drop-shadow(0 0 8px #ffd700)",
+                          color: "#ffd700",
+                          transform: "scale(1.2)",
                         },
                       }}
                     >
@@ -200,40 +184,46 @@ const NotificationList = ({ notifications }) => {
               }
               subheader={
                 <Box
-                  sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
+                    mt: 1,
+                  }}
                 >
                   <Chip
                     label={notification.Type}
                     size="small"
                     sx={{
-                      background: `linear-gradient(135deg, ${typeColor} 0%, ${typeColor}cc 100%)`,
-                      color: "white",
-                      fontWeight: "bold",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        transform: "scale(1.05)",
-                        boxShadow: `0 4px 12px ${typeColor}40`,
-                      },
+                      background: `linear-gradient(135deg, ${typeColor}22 0%, ${typeColor}44 100%)`,
+                      color: typeColor,
+                      fontWeight: 600,
+                      fontSize: "0.75rem",
+                      height: "24px",
                     }}
                   />
-                  <Typography variant="caption" sx={{ color: "#999" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#a0aec0", fontSize: "0.8rem" }}
+                  >
                     {formatTimestamp(notification.Timestamp)}
                   </Typography>
                 </Box>
               }
             />
 
-            <CardContent>
+            <CardContent sx={{ pt: 0 }}>
               <Box
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  gap: 2,
                 }}
               >
                 <Typography
                   variant="body2"
-                  sx={{ color: "#666", maxWidth: "80%" }}
+                  sx={{ color: "#718096", maxWidth: "75%", fontSize: "0.9rem" }}
                 >
                   ID: {notification.ID}
                 </Typography>
@@ -241,49 +231,49 @@ const NotificationList = ({ notifications }) => {
                   <button
                     onClick={() => handleMarkAsRead(notification)}
                     style={{
-                      padding: "8px 16px",
+                      padding: "6px 14px",
                       background: `linear-gradient(135deg, ${typeColor} 0%, ${typeColor}cc 100%)`,
                       color: "white",
                       border: "none",
-                      borderRadius: "8px",
+                      borderRadius: "6px",
                       cursor: "pointer",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                      boxShadow: `0 4px 12px ${typeColor}40`,
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      transition: "all 0.3s ease",
+                      boxShadow: `0 2px 8px ${typeColor}30`,
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.transform = "translateY(-2px) scale(1.05)";
-                      e.target.style.boxShadow = `0 8px 20px ${typeColor}60`;
+                      e.target.style.transform = "translateY(-2px)";
+                      e.target.style.boxShadow = `0 4px 12px ${typeColor}50`;
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.transform = "translateY(0) scale(1)";
-                      e.target.style.boxShadow = `0 4px 12px ${typeColor}40`;
+                      e.target.style.transform = "translateY(0)";
+                      e.target.style.boxShadow = `0 2px 8px ${typeColor}30`;
                     }}
                   >
-                    Mark as Read
+                    Mark Read
                   </button>
                 </Tooltip>
               </Box>
             </CardContent>
 
-            {/* Ranking Badge */}
+            {/* Rank Badge */}
             <Box
               sx={{
                 position: "absolute",
                 top: 8,
                 right: 8,
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                background: `linear-gradient(135deg, ${typeColor} 0%, ${typeColor}cc 100%)`,
+                color: "white",
+                fontWeight: 700,
+                fontSize: "0.9rem",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                backgroundColor: typeColor,
-                color: "white",
-                fontWeight: "bold",
-                fontSize: "14px",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                boxShadow: `0 4px 12px ${typeColor}30`,
               }}
             >
               #{index + 1}

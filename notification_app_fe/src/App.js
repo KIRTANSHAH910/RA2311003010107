@@ -4,7 +4,6 @@ import {
   Paper,
   Box,
   Button,
-  TextField,
   CircularProgress,
   Alert,
   Chip,
@@ -20,24 +19,33 @@ import {
   EventAvailable as EventIcon,
   EmojiEvents as ResultIcon,
   Work as PlacementIcon,
+  RefreshOutlined as RefreshIcon,
 } from "@mui/icons-material";
-import NotificationList from "./components/NotificationList";
+import NotificationList from "./components/NotificationListNew";
 import {
   fetchNotifications,
   calculatePriority,
   filterAndSortNotifications,
 } from "./utils/notificationUtils";
-import { Log, initializeLogger, logApi } from "./utils/logger";
+import { Log, initializeLogger } from "./utils/logger";
 
 function App() {
   const [notifications, setNotifications] = useState([]);
-  const [filteredNotifications, setFilteredNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState("");
   const [totalPages, setTotalPages] = useState(0);
+
+  // Initialize logger with credentials
+  useEffect(() => {
+    initializeLogger(
+      "1cab4f98-d329-421e-a8e7-78d2a646b7aa",
+      "hPYJGPebPpNhdvnN",
+    );
+    Log("frontend", "info", "page", "App initialized");
+  }, []);
 
   // Fetch notifications on component mount and when parameters change
   useEffect(() => {
@@ -52,16 +60,13 @@ function App() {
           `Fetching notifications - limit: ${limit}, type: ${filterType}`,
         );
 
-        // Fetch all notifications (API doesn't have server-side pagination with priority)
         const data = await fetchNotifications(limit, 1, filterType);
 
-        // Calculate priority for each notification
         const notificationsWithPriority = data.map((notification) => ({
           ...notification,
           priority: calculatePriority(notification),
         }));
 
-        // Filter and sort by priority
         const processed = filterAndSortNotifications(
           notificationsWithPriority,
           filterType,
@@ -75,7 +80,6 @@ function App() {
           `Loaded ${processed.length} notifications`,
         );
 
-        // Calculate pagination
         const pages = Math.ceil(processed.length / limit);
         setTotalPages(pages);
         setCurrentPage(1);
@@ -90,7 +94,6 @@ function App() {
     loadNotifications();
   }, [limit, filterType]);
 
-  // Get paginated notifications
   const getPaginatedNotifications = () => {
     const startIndex = (currentPage - 1) * limit;
     const endIndex = startIndex + limit;
@@ -124,136 +127,334 @@ function App() {
   const paginatedNotifications = getPaginatedNotifications();
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Header */}
-      <Box sx={{ mb: 4, display: "flex", alignItems: "center", gap: 2 }}>
-        <NotificationsIcon sx={{ fontSize: 40, color: "primary.main" }} />
-        <div>
-          <h1 style={{ margin: "0 0 8px 0" }}>Campus Notifications</h1>
-          <p style={{ margin: 0, color: "#666" }}>
-            Stay updated with important announcements and updates
-          </p>
-        </div>
-      </Box>
-
-      {/* Error Alert */}
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      {/* Controls */}
-      <Paper sx={{ p: 3, mb: 3, backgroundColor: "#f9f9f9" }}>
-        <Grid container spacing={2} alignItems="flex-end">
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-              <InputLabel>Filter by Type</InputLabel>
-              <Select
-                value={filterType}
-                label="Filter by Type"
-                onChange={handleFilterTypeChange}
-              >
-                <MenuItem value="">All Types</MenuItem>
-                <MenuItem value="Placement">Placement</MenuItem>
-                <MenuItem value="Result">Result</MenuItem>
-                <MenuItem value="Event">Event</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-              <InputLabel>Limit per Page</InputLabel>
-              <Select
-                value={limit.toString()}
-                label="Limit per Page"
-                onChange={handleLimitChange}
-              >
-                <MenuItem value="5">5</MenuItem>
-                <MenuItem value="10">10</MenuItem>
-                <MenuItem value="15">15</MenuItem>
-                <MenuItem value="20">20</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
-      </Paper>
-
-      {/* Stats */}
-      <Box sx={{ mb: 3, display: "flex", gap: 1, flexWrap: "wrap" }}>
-        <Chip
-          icon={<PlacementIcon />}
-          label={`${notifications.filter((n) => n.Type === "Placement").length} Placements`}
-          color={filterType === "Placement" ? "primary" : "default"}
-          variant="outlined"
-        />
-        <Chip
-          icon={<ResultIcon />}
-          label={`${notifications.filter((n) => n.Type === "Result").length} Results`}
-          color={filterType === "Result" ? "primary" : "default"}
-          variant="outlined"
-        />
-        <Chip
-          icon={<EventIcon />}
-          label={`${notifications.filter((n) => n.Type === "Event").length} Events`}
-          color={filterType === "Event" ? "primary" : "default"}
-          variant="outlined"
-        />
-        <Chip label={`Total: ${notifications.length}`} variant="filled" />
-      </Box>
-
-      {/* Loading State */}
-      {loading && (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-          <CircularProgress />
+    <Box
+      sx={{
+        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        minHeight: "100vh",
+        py: 4,
+      }}
+    >
+      <Container maxWidth="lg">
+        {/* Header */}
+        <Box
+          sx={{
+            mb: 4,
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            animation: "fadeIn 0.8s ease",
+          }}
+        >
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: "16px",
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <NotificationsIcon sx={{ fontSize: 40, color: "white" }} />
+          </Box>
+          <Box>
+            <h1
+              style={{
+                margin: "0 0 8px 0",
+                fontSize: "2.2rem",
+                fontWeight: 700,
+                color: "#2d3748",
+              }}
+            >
+              Campus Notifications
+            </h1>
+            <p
+              style={{
+                margin: 0,
+                color: "#718096",
+                fontSize: "0.95rem",
+              }}
+            >
+              Stay informed with important updates and announcements
+            </p>
+          </Box>
         </Box>
-      )}
 
-      {/* Notifications List */}
-      {!loading && (
-        <>
-          {paginatedNotifications.length > 0 ? (
-            <>
-              <NotificationList notifications={paginatedNotifications} />
+        {/* Error Alert */}
+        {error && (
+          <Alert
+            severity="error"
+            sx={{
+              mb: 3,
+              borderRadius: "12px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            }}
+          >
+            {error}
+          </Alert>
+        )}
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-                  <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={handlePageChange}
-                    size="large"
-                  />
-                </Box>
-              )}
-            </>
-          ) : (
-            <Alert severity="info" sx={{ mt: 3 }}>
-              No notifications found
-            </Alert>
-          )}
-        </>
-      )}
+        {/* Controls Section */}
+        <Paper
+          sx={{
+            p: 3,
+            mb: 3,
+            borderRadius: "16px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+            transition: "all 0.3s ease",
+            "&:hover": {
+              boxShadow: "0 15px 40px rgba(0,0,0,0.12)",
+            },
+          }}
+        >
+          <Grid container spacing={3} alignItems="flex-end">
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: "#4a5568" }}>
+                  Filter by Type
+                </InputLabel>
+                <Select
+                  value={filterType}
+                  label="Filter by Type"
+                  onChange={handleFilterTypeChange}
+                  sx={{
+                    borderRadius: "10px",
+                    "& .MuiOutlinedInput-root": {
+                      "&:hover fieldset": {
+                        borderColor: "#667eea",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#667eea",
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value="">All Types</MenuItem>
+                  <MenuItem value="Placement">Placement</MenuItem>
+                  <MenuItem value="Result">Result</MenuItem>
+                  <MenuItem value="Event">Event</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
 
-      {/* Footer */}
-      <Box
-        sx={{
-          mt: 4,
-          pt: 3,
-          borderTop: "1px solid #e0e0e0",
-          textAlign: "center",
-        }}
-      >
-        <Button variant="outlined" onClick={handleRefresh} disabled={loading}>
-          Refresh Notifications
-        </Button>
-        <p style={{ marginTop: "16px", color: "#999", fontSize: "12px" }}>
-          Last updated: {new Date().toLocaleTimeString()}
-        </p>
-      </Box>
-    </Container>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: "#4a5568" }}>
+                  Items Per Page
+                </InputLabel>
+                <Select
+                  value={limit.toString()}
+                  label="Items Per Page"
+                  onChange={handleLimitChange}
+                  sx={{
+                    borderRadius: "10px",
+                    "& .MuiOutlinedInput-root": {
+                      "&:hover fieldset": {
+                        borderColor: "#667eea",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#667eea",
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value="5">5</MenuItem>
+                  <MenuItem value="10">10</MenuItem>
+                  <MenuItem value="15">15</MenuItem>
+                  <MenuItem value="20">20</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </Paper>
+
+        {/* Statistics */}
+        <Box
+          sx={{
+            mb: 4,
+            display: "flex",
+            gap: 2,
+            flexWrap: "wrap",
+            animation: "fadeIn 0.8s ease",
+          }}
+        >
+          <Chip
+            icon={<PlacementIcon />}
+            label={`${notifications.filter((n) => n.Type === "Placement").length} Placements`}
+            sx={{
+              borderRadius: "8px",
+              height: "40px",
+              fontSize: "0.95rem",
+              fontWeight: 600,
+              background:
+                filterType === "Placement"
+                  ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                  : "rgba(255, 255, 255, 0.9)",
+              color: filterType === "Placement" ? "white" : "#2d3748",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              border:
+                filterType === "Placement"
+                  ? "none"
+                  : "1px solid rgba(0,0,0,0.1)",
+            }}
+          />
+          <Chip
+            icon={<ResultIcon />}
+            label={`${notifications.filter((n) => n.Type === "Result").length} Results`}
+            sx={{
+              borderRadius: "8px",
+              height: "40px",
+              fontSize: "0.95rem",
+              fontWeight: 600,
+              background:
+                filterType === "Result"
+                  ? "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+                  : "rgba(255, 255, 255, 0.9)",
+              color: filterType === "Result" ? "white" : "#2d3748",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              border:
+                filterType === "Result" ? "none" : "1px solid rgba(0,0,0,0.1)",
+            }}
+          />
+          <Chip
+            icon={<EventIcon />}
+            label={`${notifications.filter((n) => n.Type === "Event").length} Events`}
+            sx={{
+              borderRadius: "8px",
+              height: "40px",
+              fontSize: "0.95rem",
+              fontWeight: 600,
+              background:
+                filterType === "Event"
+                  ? "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+                  : "rgba(255, 255, 255, 0.9)",
+              color: filterType === "Event" ? "white" : "#2d3748",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              border:
+                filterType === "Event" ? "none" : "1px solid rgba(0,0,0,0.1)",
+            }}
+          />
+          <Chip
+            label={`Total: ${notifications.length}`}
+            sx={{
+              borderRadius: "8px",
+              height: "40px",
+              fontSize: "0.95rem",
+              fontWeight: 600,
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "white",
+              boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
+            }}
+          />
+        </Box>
+
+        {/* Loading State */}
+        {loading && (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+            <CircularProgress
+              sx={{
+                color: "#667eea",
+                width: "50px !important",
+                height: "50px !important",
+              }}
+            />
+          </Box>
+        )}
+
+        {/* Notifications List */}
+        {!loading && (
+          <>
+            {paginatedNotifications.length > 0 ? (
+              <>
+                <NotificationList notifications={paginatedNotifications} />
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", my: 4 }}
+                  >
+                    <Pagination
+                      count={totalPages}
+                      page={currentPage}
+                      onChange={handlePageChange}
+                      size="large"
+                      sx={{
+                        "& .MuiPaginationItem-root": {
+                          borderRadius: "8px",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            background: "rgba(102, 126, 234, 0.1)",
+                            transform: "scale(1.05)",
+                          },
+                          "&.Mui-selected": {
+                            background:
+                              "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                            color: "white",
+                            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
+                          },
+                        },
+                      }}
+                    />
+                  </Box>
+                )}
+              </>
+            ) : (
+              <Alert
+                severity="info"
+                sx={{
+                  mt: 3,
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+              >
+                No notifications found. Try adjusting your filters.
+              </Alert>
+            )}
+          </>
+        )}
+
+        {/* Footer */}
+        <Box
+          sx={{
+            mt: 6,
+            pt: 4,
+            borderTop: "1px solid rgba(0,0,0,0.1)",
+            textAlign: "center",
+          }}
+        >
+          <Button
+            variant="contained"
+            startIcon={<RefreshIcon />}
+            onClick={handleRefresh}
+            disabled={loading}
+            sx={{
+              borderRadius: "10px",
+              px: 4,
+              py: 1.5,
+              fontSize: "1rem",
+              fontWeight: 600,
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)",
+              color: "white",
+              textTransform: "none",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                transform: "translateY(-2px)",
+                boxShadow: "0 8px 25px rgba(102, 126, 234, 0.5)",
+              },
+              "&:disabled": {
+                opacity: 0.6,
+              },
+            }}
+          >
+            Refresh Notifications
+          </Button>
+          <p style={{ marginTop: "20px", color: "#718096", fontSize: "14px" }}>
+            Last updated: {new Date().toLocaleTimeString()}
+          </p>
+        </Box>
+      </Container>
+    </Box>
   );
 }
 
