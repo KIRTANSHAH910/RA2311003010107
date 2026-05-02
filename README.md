@@ -1,16 +1,16 @@
 # Campus Notifications Frontend Application
 
-## ⚠️ PRE-TEST SETUP REQUIRED
+##  PRE-TEST SETUP REQUIRED
 
 **Before submission, complete the steps in [PRE-TEST-SETUP.md](PRE-TEST-SETUP.md)**
 
 Key requirements:
 
-- ✅ Register on Test Server (get clientID & clientSecret)
-- ✅ Initialize logger with credentials
-- ✅ Implement Log(stack, level, package, message) function
-- ✅ Delete backend folder (Frontend track only)
-- ✅ Take mobile and desktop screenshots
+-  Register on Test Server (get clientID & clientSecret)
+-  Initialize logger with credentials
+-  Implement Log(stack, level, package, message) function
+-  Delete backend folder (Frontend track only)
+-  Take mobile and desktop screenshots
 
 ---
 
@@ -35,7 +35,7 @@ This is a **Frontend-Only** Campus Notifications application built with **React*
 
 ## Pre-Test Setup
 
-### 🚨 CRITICAL: Read [PRE-TEST-SETUP.md](PRE-TEST-SETUP.md) First
+###  CRITICAL: Read [PRE-TEST-SETUP.md](PRE-TEST-SETUP.md) First
 
 This document contains:
 
@@ -168,7 +168,7 @@ npm start
 
 ## Feature Details
 
-### Stage 1: Priority System Design ✅
+### Stage 1: Priority System Design 
 
 Complete! See `notification_system_design.md`
 
@@ -179,7 +179,7 @@ Key features:
 - Unread notification boost
 - Detailed algorithm documentation
 
-### Stage 2: Frontend Application ✅
+### Stage 2: Frontend Application 
 
 Complete! React app with Material UI
 
@@ -194,7 +194,7 @@ Key features:
 - Comprehensive error handling
 - Integrated logging
 
-### Logging System ✅
+### Logging System 
 
 Complete! Integrated throughout
 
@@ -484,6 +484,6 @@ For questions or support, contact the development team.
 
 ---
 
-**Status**: ✅ Complete and Ready for Testing
+**Status**:  Complete and Ready for Testing
 **Last Updated**: 2024-01-01
 **Next Steps**: Deploy and monitor in production
